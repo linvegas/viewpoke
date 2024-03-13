@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { watchEffect, ref } from "vue";
 
-type PokeResult = {
+type PokeResults = {
   name: string,
   url: string,
 }
 
-type PokeList = {
-  results: PokeResult[],
+type PokeResources = {
+  results: PokeResults[],
 }
 
 type PokeData = {
@@ -29,26 +29,42 @@ type PokeData = {
   }[];
 };
 
-const data = ref<PokeList>();
-const results = ref<PokeResult[]>([]);
-const pokemons = ref<PokeData[]>([]);
+const resource_data = ref<PokeResources>();
+const resource_list = ref<PokeResults[]>([]);
+const pokemon_list = ref<PokeData[]>([]);
+const input_suggest = ref<PokeResults[]>([]);
 
-const pokeQuery = ref("");
+const poke_query = ref("");
+
+const RES_URL = "https://pokeapi.co/api/v2/pokemon?limit=1000&offset=0";
+
+watchEffect(async () => {
+  let query = poke_query.value;
+
+  if (!query.length) return;
+
+  let data: PokeResources;
+
+  const res = await fetch(RES_URL)
+  data = await res.json();
+
+  input_suggest.value = data.results.filter(v => v.name.includes(query.toLowerCase())) || [];
+})
 
 async function fetchPokemons() {
-  let query = pokeQuery.value;
-  if (!query.length) return;
-  const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1000&offset=0")
-  data.value = await res.json();
-  results.value = data.value?.results.filter(v => v.name.includes(query)) || [];
+  let query = poke_query.value;
 
-  const pokemonPromises = results.value.map(r =>
+  if (!query.length) return;
+
+  const res = await fetch(RES_URL)
+  resource_data.value = await res.json();
+  resource_list.value = resource_data.value?.results.filter(v => v.name.includes(query.toLowerCase())) || [];
+
+  const pokemonPromises = resource_list.value.map(r =>
     fetch(r.url).then(res => res.json()),
   );
 
-  pokemons.value = await Promise.all(pokemonPromises)
-
-  console.log(pokemons.value);
+  pokemon_list.value = await Promise.all(pokemonPromises)
 }
 
 </script>
@@ -66,11 +82,14 @@ async function fetchPokemons() {
       <form id="poke-form" @submit.prevent="fetchPokemons">
         <label>
           Search for a pokemon: <br>
-          <input v-model="pokeQuery" type="text" placeholder="Cubone" />
+          <input list="pokenames" name="pokequery" v-model="poke_query" type="text" placeholder="Cubone" />
+          <datalist id="pokenames">
+            <option v-for="s in input_suggest" :value="s.name"></option>
+          </datalist>
         </label>
       </form>
       <ul id="poke-list">
-        <li v-for="p in pokemons" >
+        <li v-for="p in pokemon_list" >
           <p>{{p.name}} {{p.id}}</p>
           <img :src="p.sprites.front_default" loading="lazy" alt="Sprite" />
         </li>
