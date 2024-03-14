@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { watchEffect, ref } from "vue";
 
+import logo from "./snorlax.png";
+
 type PokeResults = {
   name: string,
   url: string,
@@ -70,53 +72,85 @@ async function fetchPokemons() {
 </script>
 
 <template>
-  <div id="layout">
-    <header>
-      <h1>ViewPoke</h1>
-      <nav>
-        <a href="/gallery">Gallery</a>
-        <a href="/about">About</a>
-      </nav>
-    </header>
-    <main>
+  <main id="layout">
+    <section>
+      <header>
+        <img id="logo" :src="logo" alt="Logo" />
+        <h1>ViewPoke</h1>
+        <h4>Search for your favorite pokemon</h4>
+      </header>
       <form id="poke-form" @submit.prevent="fetchPokemons">
-        <label>
-          Search for a pokemon: <br>
-          <input list="pokenames" name="pokequery" v-model="poke_query" type="text" placeholder="Cubone" />
-          <datalist id="pokenames">
-            <option v-for="s in input_suggest" :value="s.name"></option>
-          </datalist>
-        </label>
+        <label for="pokequery"> Search for a pokemon: </label>
+        <input
+          id="pokequery"
+          name="pokequery"
+          list="pokenames"
+          v-model="poke_query"
+          type="text"
+          placeholder="Cubone"
+        />
+        <datalist id="pokenames">
+          <option v-for="s in input_suggest" :value="s.name"></option>
+        </datalist>
       </form>
-      <ul id="poke-list">
+      <ul id="suggest-list">
+        <li>Pikachu</li>
+        <li>Cubone</li>
+        <li>Snorlax</li>
+      </ul>
+    </section>
+      <!-- <ul id="poke-list">
         <li v-for="p in pokemon_list" >
           <p>{{p.name}} {{p.id}}</p>
           <img :src="p.sprites.front_default" loading="lazy" alt="Sprite" />
         </li>
-      </ul>
-    </main>
-  </div>
+      </ul> -->
+  </main>
 </template>
 
 <style scoped>
-  div#layout {
-    width: min(100% - 3rem, 1000px);
-    margin-inline: auto;
+  main#layout {
+    display: grid;
+    place-content: center;
+    min-height: 100vh;
+  }
+  section {
+    & > *:not(:last-child) {
+      margin-bottom: 2rem;
+    }
+    & > :last-child {
+      margin-bottom: 6rem;
+    }
   }
   header {
-    padding-block: 1rem;
-    margin-bottom: 2em;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    & > nav > * {
-       margin-left: 1rem;
+    text-align: center;
+    & img#logo {
+      max-width: 150px;
+      margin-inline: auto;
+      margin-bottom: 2.25rem;
+      filter: drop-shadow(0 0 30px rgba(135, 206, 235, 0.35));
+    }
+    & > h1 {
+      margin-bottom: 0.5rem;
     }
   }
   form#poke-form {
     text-align: center;
+    & label {
+      display: none;
+    }
   }
-  ul#poke-list {
+  ul#suggest-list {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    & > * {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 0.5rem;
+      padding: 0.15rem 0.3rem;
+    }
+  }
+  /* ul#poke-list {
     padding-block: 4rem;
     display: flex;
     justify-content: center;
@@ -125,5 +159,5 @@ async function fetchPokemons() {
     & li > img {
       margin-inline: auto;
     }
-  }
+  } */
 </style>
