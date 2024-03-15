@@ -14,7 +14,7 @@ type Params = {
 
 const routes: Routes = {
   "/": Home,
-  "/pokemon/:id": Pokemon,
+  "/pokemon/:name": Pokemon,
 };
 
 const current_path = ref<string>(window.location.hash);
@@ -47,7 +47,6 @@ const current_view = computed(() => {
 
   return routes[current_path.value.slice(1) || "/"]
 })
-
 </script>
 
 <template>
