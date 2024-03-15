@@ -94,13 +94,13 @@ async function fetchPokemons() {
       </form>
       <ul id="suggest-list">
         <li>
-          <a href="#/id">Pikachu</a>
+          <a href="#/pokemon/25">Pikachu</a>
         </li>
         <li>
-          <a href="#/id">Cubone</a>
+          <a href="#/pokemon/104">Cubone</a>
         </li>
         <li>
-          <a href="#/id">Snorlax</a>
+          <a href="#/pokemon/143">Snorlax</a>
         </li>
       </ul>
     </section>
