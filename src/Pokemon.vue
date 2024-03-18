@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, watch } from "vue";
+import { useRoute  } from "vue-router";
 
 type PokeData = {
   id: number;
@@ -22,12 +23,14 @@ type PokeData = {
 
 const poke = ref<PokeData>();
 
-const param_name = ref(window.location.hash.split('/').pop());
+const route = useRoute();
 
-onMounted(async () => {
-  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${param_name.value}`);
+watch(() => route.params.name, fetch_pokemon, {immediate: true})
+
+async function fetch_pokemon(name: string) {
+  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
   poke.value = await res.json();
-})
+}
 </script>
 
 <template>

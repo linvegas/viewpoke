@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { watchEffect, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import logo from "./snorlax.png";
 
@@ -16,8 +17,6 @@ const input_suggest = ref<PokeResults[]>([]);
 
 const poke_query = ref("");
 
-const RES_URL = "https://pokeapi.co/api/v2/pokemon?limit=1000&offset=0";
-
 watchEffect(async () => {
   let query = poke_query.value;
 
@@ -28,18 +27,20 @@ watchEffect(async () => {
 
   let data: PokeResources;
 
-  const res = await fetch(RES_URL)
+  const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1000&offset=0")
   data = await res.json();
 
   input_suggest.value = data.results.filter(v => v.name.includes(query.toLowerCase())) || [];
 })
 
-async function fetch_pokemon() {
+const router = useRouter();
+
+async function handle_search_form() {
   let query = poke_query.value.toLowerCase();
 
   if (!query.length) return;
 
-  window.location.href = `#/pokemon/${query}`;
+  router.push(`/pokemon/${query}`);
 }
 </script>
 
@@ -51,7 +52,7 @@ async function fetch_pokemon() {
         <h1>ViewPoke</h1>
         <h4>Search for your favorite pokemon</h4>
       </header>
-      <form id="poke-form" @submit.prevent="fetch_pokemon">
+      <form id="poke-form" @submit.prevent="handle_search_form">
         <label for="pokequery"> Search for a pokemon: </label>
         <input
           id="pokequery"
@@ -68,13 +69,13 @@ async function fetch_pokemon() {
       </form>
       <ul id="suggest-list">
         <li>
-          <a href="#/pokemon/pikachu">Pikachu</a>
+          <RouterLink to="/pokemon/pikachu">Pikachu</RouterLink>
         </li>
         <li>
-          <a href="#/pokemon/cubone">Cubone</a>
+          <RouterLink to="/pokemon/cubone">Cubone</RouterLink>
         </li>
         <li>
-          <a href="#/pokemon/snorlax">Snorlax</a>
+          <RouterLink to="/pokemon/snorlax">Snorlax</RouterLink>
         </li>
       </ul>
     </section>
